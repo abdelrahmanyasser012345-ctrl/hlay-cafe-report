@@ -262,6 +262,38 @@ footer .tagline{font-weight:800;color:var(--yellow);font-size:1.3rem}
   .progress{animation:prog linear both;animation-timeline:scroll(root)}
   @keyframes prog{to{transform:scaleX(1)}}
 }
+
+/* mobile */
+.swipe{display:none}
+@media (max-width:640px){
+ .wrap{padding-inline:16px}
+ .hero .wrap{padding-block:30px 40px;gap:26px}
+ .hero .meta{font-size:.6rem}
+ .logo-row{gap:10px}.logo-row img{height:52px}.logo-row img.hl-logo{height:46px}.logo-row .x{font-size:1.2rem}
+ .hero h1{font-size:2.05rem}.hero .sub{font-size:.95rem}
+ .pills{gap:6px}.pill{font-size:.7rem;padding:7px 12px}
+ .hero-mark{max-width:250px}.frame-txt{padding:10%}.frame-txt b{font-size:2.1rem}.frame-txt span{font-size:.9rem}.frame-logo{height:42px;margin-bottom:4px}
+ .kpis{padding-block:28px 36px;gap:10px}.kpi{padding:16px}.kpi b{font-size:1.6rem}.kpi.main b{font-size:2.5rem}
+ .head h2,.block h2{font-size:1.6rem}
+ .controls{flex-direction:column;align-items:stretch;gap:8px;min-width:0;max-width:100%}
+ main.wrap,.block,.head{min-width:0;max-width:100%}
+ .controls .seg,.controls .chips{min-width:0;width:100%;max-width:100%;flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;scroll-snap-type:x proximity}
+ .controls .seg::-webkit-scrollbar,.controls .chips::-webkit-scrollbar{display:none}
+ .controls .seg button,.controls .chips .chip{flex:none;white-space:nowrap;scroll-snap-align:start}
+ .chart-card .legend span:last-child{display:none}
+ .cards{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;gap:12px;margin-inline:-16px;padding:4px 16px 14px;scroll-padding-inline:16px;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+ .cards::-webkit-scrollbar{display:none}
+ .cards .card{flex:0 0 82%;scroll-snap-align:center;animation:none}
+ .cards .media{aspect-ratio:4/5}
+ .swipe{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:6px;font-size:.85rem;color:var(--muted)}
+ .swipe b{font-family:var(--en);color:var(--purple)}
+ .swipe .sbtn{display:flex;gap:8px}
+ .swipe button{width:40px;height:40px;border-radius:50%;border:1.5px solid var(--purple);background:var(--paper);color:var(--purple);font-size:1.1rem;cursor:pointer}
+ .swipe button:active{transform:scale(.92)}
+ .swipe .bar{flex:1;height:4px;border-radius:4px;background:var(--line);overflow:hidden}.swipe .bar i{display:block;height:100%;background:var(--purple);width:0;transition:width .2s}
+ .two{gap:10px}.note-box{padding:20px}
+ footer .wrap{flex-direction:column-reverse;align-items:flex-start}footer .wrap>*{max-width:100%;min-width:0}.flogos{gap:14px;flex-wrap:wrap}.flogos img{height:52px!important;width:auto}.flogos .bw{font-size:1.5rem}
+}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}html{scroll-behavior:auto}#spark,.progress{display:none}}
 </style>
 </head>
@@ -342,6 +374,7 @@ footer .tagline{font-weight:800;color:var(--yellow);font-size:1.3rem}
     <div class="head"><p class="label">04 / COVERAGE</p><h2>50 صانع محتوى، وكل فيديو يشتغل هنا مباشرة</h2>
     <p class="lede">مقطع من كل تغطية يعمل تلقائياً بدون صوت. اضغط زر الصوت لتسمعه، أو افتح الفيديو كاملاً على تيك توك.</p></div>
     <div class="cards" id="cards"></div>
+    <div class="swipe" aria-hidden="true"><span>اسحب للتغطيات · <b id="swCur">1</b> / <b id="swTot">0</b></span><span class="bar"><i id="swBar"></i></span><span class="sbtn"><button type="button" id="swPrev" aria-label="السابق">→</button><button type="button" id="swNext" aria-label="التالي">←</button></span></div>
   </section>
 
   <section class="block">
@@ -397,7 +430,7 @@ const rowsEl={};const box=document.getElementById('bars');const tip=document.get
 D.forEach((d,i)=>{const r=document.createElement('button');r.type='button';r.className='row grid-row'+(TOP.has(d.u)?' top':'');
   r.innerHTML=`<span class="rk"></span><span class="who"><b>${d.u}</b><small>${short(d.f)} متابع</small></span><span class="rail"><span class="fill"></span><span class="v">0</span></span>`;
   r._cur=0;
-  r.onclick=()=>{const c=document.getElementById(d.id);c.scrollIntoView({behavior:reduce?'auto':'smooth',block:'start'});c.classList.add('flash');setTimeout(()=>c.classList.remove('flash'),1600);const v=c.querySelector('video');if(v)v.play().catch(()=>{})};
+  r.onclick=()=>{const c=document.getElementById(d.id);c.scrollIntoView({behavior:reduce?'auto':'smooth',block:matchMedia('(max-width:640px)').matches?'center':'start',inline:'center'});c.classList.add('flash');setTimeout(()=>c.classList.remove('flash'),1600);const v=c.querySelector('video');if(v)v.play().catch(()=>{})};
   r.addEventListener('mousemove',e=>{const cb=box.parentElement.getBoundingClientRect();tip.innerHTML=`<h4>${d.u} · ${short(d.f)} متابع</h4><span>متابعين</span><span class="num">${fmt(d.f)}</span><span>مشاهدة</span><span class="num">${fmt(d.v)}</span><span>إعجاب</span><span class="num">${fmt(d.lk)}</span><span>تعليق</span><span class="num">${fmt(d.c)}</span><span>حفظ ومشاركة</span><span class="num">${fmt(d.s)}</span><span>نسبة التفاعل</span><span class="num">${d.er.toFixed(2)}%</span>`;let x=e.clientX-cb.left+16,y=e.clientY-cb.top+16;if(x+220>cb.width)x=e.clientX-cb.left-236;tip.style.left=x+'px';tip.style.top=y+'px';tip.classList.add('on')});
   r.addEventListener('mouseleave',()=>tip.classList.remove('on'));
   rowsEl[d.u]=r;box.appendChild(r)});
@@ -508,6 +541,14 @@ document.querySelectorAll('.sound').forEach(btn=>btn.addEventListener('click',()
   vids.forEach(o=>{o.muted=true});document.querySelectorAll('.sound').forEach(b=>{b.setAttribute('aria-pressed','false');b.textContent='🔇 تشغيل الصوت'});
   if(on){v.muted=false;v.play().catch(()=>{});btn.setAttribute('aria-pressed','true');btn.textContent='🔊 الصوت شغّال'}
 }));
+
+// mobile swipe carousel for the cards
+(()=>{const box=document.getElementById('cards');if(!box)return;const cs=[...box.children];document.getElementById('swTot').textContent=cs.length;
+ const cur=()=>{const b=box.getBoundingClientRect(),mid=b.left+b.width/2;let bi=0,bd=1e9;cs.forEach((c,i)=>{const r=c.getBoundingClientRect(),d=Math.abs(r.left+r.width/2-mid);if(d<bd){bd=d;bi=i}});return bi};
+ const upd=()=>{const i=cur();document.getElementById('swCur').textContent=i+1;document.getElementById('swBar').style.width=((i+1)/cs.length*100)+'%'};
+ box.addEventListener('scroll',()=>requestAnimationFrame(upd),{passive:true});
+ const go=d=>{const i=Math.max(0,Math.min(cs.length-1,cur()+d));cs[i].scrollIntoView({behavior:'smooth',block:'nearest',inline:'center'})};
+ document.getElementById('swPrev').onclick=()=>go(-1);document.getElementById('swNext').onclick=()=>go(1);upd()})();
 </script>
 
 </body>
